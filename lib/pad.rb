@@ -33,7 +33,7 @@ class Pad
     }
   ]
 
-  attr_accessor :buttons
+  attr_accessor :buttons, :light
 
   def Pad.init_mappings
     @@pads = []
@@ -53,6 +53,7 @@ class Pad
   def initialize(mapping, index)
     @index = index
     @buttons = {}
+    @light = Light.new(index)
     mapping.each do |code, name|
       @buttons[name] = Button.new(code, name, self)
     end
