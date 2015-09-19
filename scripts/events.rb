@@ -14,9 +14,9 @@ dev.start_watching
 
 begin
   loop do
-    RubyBuzz::Pad.all.each{|p|p.light.off}
+    RubyBuzz::Light.all.each{|p|p.light.off}
     sleep 10
   end 
 rescue SystemExit, Interrupt
-  RubyBuzz::Pad.all.each{|p|p.light.off}
+  RubyBuzz::Light.all_off
 end
