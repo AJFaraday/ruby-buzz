@@ -7,7 +7,7 @@ class DevInput
   # The worker is a thread which is watching the device
   attr_accessor :worker
 
-  KEY_VALUES = ['Release', 'Press', 'Repeat']
+  DEFAULT_FILE_NAME = "/dev/input/by-id/usb-Logitech_Logitech_Buzz_tm__Controller_V1-event-if00"
 
   Event = Struct.new(:tv_sec, :tv_usec, :type, :code, :value)
   # open Event class and add some convenience methods
@@ -24,8 +24,8 @@ class DevInput
     end
   end
 
-  def initialize(filename)
-    @dev = File.open(filename)
+  def initialize(filename=nil)
+    @dev = File.open(filename || DEFAULT_FILE_NAME)
     @block_size = 24
   end
 
@@ -52,7 +52,7 @@ class DevInput
   end
 
 
-  def watch
+  def start_watching
     @worker = Thread.new do
       begin
         loop do

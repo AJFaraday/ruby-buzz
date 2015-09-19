@@ -9,11 +9,14 @@ Pad.all.each_with_index do |pad, index|
                 }
 end
 
-filename = ARGV[0] || "/dev/input/event10"
-dev = DevInput.new filename
-dev.watch
+dev = DevInput.new
+dev.start_watching
 
-loop do
+begin
+  loop do
+    Pad.all.each{|p|p.light.off}
+    sleep 10
+  end 
+rescue SystemExit, Interrupt
   Pad.all.each{|p|p.light.off}
-  sleep 10
 end
