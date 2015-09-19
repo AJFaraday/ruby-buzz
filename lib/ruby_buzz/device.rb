@@ -57,21 +57,20 @@ module RubyBuzz
 
 
     def start_watching
+      return if @worker
       @worker = Thread.new do
-        begin
-          loop do
-            event = read
-            next unless event.type == 1
-            next unless event.value == 1
-            RubyBuzz::Button.trigger_key(event.code)
-          end
-        rescue Errno::ENODEV
+        loop do
+          event = read
+          next unless event.type == 1
+          next unless event.value == 1
+          RubyBuzz::Button.trigger_key(event.code)
         end
       end
     end
 
     def stop_watching
       @worker.kill
+      @worker = nil
     end
 
   end
