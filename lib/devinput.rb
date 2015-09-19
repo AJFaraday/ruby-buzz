@@ -27,6 +27,9 @@ class DevInput
   def initialize(filename=nil)
     @dev = File.open(filename || DEFAULT_FILE_NAME)
     @block_size = 24
+  rescue Errno::ENOENT => er
+    puts "Could not find device: are your controllers plugged in?"
+    raise er
   end
 
   def format
