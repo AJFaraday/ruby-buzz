@@ -6,6 +6,10 @@ A Ruby library for controlling the LEDs on buzz controllers in Linux.
 * Linux only
 * Wired buzz controllers only
 
+*Warning:* ruby_buzz has to change some rights down in the /sys and /dev
+folders of Linux in order to access the kernel. You will be asked for
+your password in order to use ruby_buzz.
+
 Example Scripts
 ===============
 
@@ -106,6 +110,75 @@ Include the ruby_buzz library
 
 `require 'ruby_buzz'`
 
+The Buzz controller has 4 pads, each of which has four buttons named:
+ 
+ * buzz
+ * blue
+ * orange
+ * green
+ * yellow
+
+They can be found like this:
+
+```ruby
+RubyBuzz::Pad[0]
+RubyBuzz::Pad[0].buttons
+RubyBuzz::Pad[0].buttons[:buzz]
+RubyBuzz::Pad.all
+```
+
+You can define a block of code to be run by a given button like this:
+
+```ruby
+RubyBuzz::Pad[0].add_event(
+  :buzz,
+  lambda {
+    puts "Player 1 buzzed!"
+  }
+)
+```
+
+You can debug the actions you've added to a button with trigger_events
+
+```ruby
+RubyBuzz::Pad[0].trigger_events
+```
+
+How about getting it to run when you press the button?
+
+The RubyBuzz::Device class is responsible for reading the raw input
+from the Buzz controllers via the linux terminal. Because it's reading
+a data stream, it needs to start a background process to allow it to 
+work while other ruby code is operating.
+
+You can start background process, which executes the events you added
+to the buttons, with start_watching.
+
+```ruby
+device = RubyBuzz::Device.new
+RubyBuzz::Pad.all.each do |pad|
+  pad.add_event(:buzz, lambda { puts "Buzz!" }
+)
+device.start_watching
+```
+
+Note: This process will end when your ruby process ends, but if you
+want to stop it before that stage, you can call `device.stop_watching`
+
+If you want to do nothing other than watch the buttons, you may want
+to follow start_watching with an empty loop.
+
+```ruby
+device = RubyBuzz::Device.new
+RubyBuzz::Pad.all.each do |pad|
+  pad.add_event(:buzz, lambda { puts "Buzz!" }
+)
+device.start_watching
+
+loop do
+
+end 
+```
 
 Acknowledgements
 ===============
