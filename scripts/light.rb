@@ -7,7 +7,7 @@ puts "index: #{index}"
 puts "mode: #{mode}"
 
 if mode == 'on'
-  Light.new(index).on
+  RubyBuzz::Light.new(index).on
 else
-  Light.new(index).off
+  RubyBuzz::Light.new(index).off
 end
