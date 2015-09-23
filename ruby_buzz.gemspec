@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'ruby_buzz'
-  s.version     = '0.0.1'
+  s.version     = '0.0.2'
   s.date        = '2015-09-19'
   s.summary     = 'Buzz™ controller support for Ruby in Linux'
   s.description = 'Light control and button event observers for wired Buzz™ controllers in Ruby on Linux'
