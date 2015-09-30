@@ -1,47 +1,27 @@
-module RubyHid
+module RubyBuzz
   #
   # The main interface for the Buzz controllers. Primarily
   # used to monitor key pushes and trigger events. Keep a single
   # instance of the class:
   #
-  # `RubyHid::Device.new`
+  # `RubyBuzz::Device.new`
   #
   # The `each` method exposes events directly as they come in
   #
   # `device.each { |event| puts event }`
   #
   # The `start_watching` method starts a background job which
-  # runs the events bound to each button via the RubyHid::Button
+  # runs the events bound to each button via the RubyBuzz::Button
   # class. You can end this worker with `stop_watching`.
   #
   class Device
-
-    #
-    # Event types we're interested in, used to filter out meta-data.
-    #
-    # 1 - button type
-    #
-    ALLOWED_EVENT_TYPES = [
-      1
-    ]
-
-    #
-    # List possible devices from /dev/input/by-id/
-    #
-    # Or, list devices containing a string with search_term argument
-    #
-    def Device.list(search_term=nil)
-      if search_term
-        Dir["/dev/input/by-id/*#{search_term}*event*"]
-      else
-        Dir['/dev/input/by-id/*event*']
-      end
-    end
 
     require 'time'
 
     # The worker is a thread which is watching the device
     attr_accessor :worker
+
+    DEFAULT_FILE_NAME = "/dev/input/by-id/usb-Logitech_Logitech_Buzz_tm__Controller_V1-event-if00"
 
     Event = Struct.new(:tv_sec, :tv_usec, :type, :code, :value)
     # open Event class and add some convenience methods
@@ -63,28 +43,26 @@ module RubyHid
     #
     # Initialise device, getting event file from /dev/input/by-id/
     #
-    def initialize(filename=nil, block_size=16)
-      @dev = File.open(filename)
-      @block_size = block_size
+    # You can override this to a different event, but ruby-buzz only
+    # supports a single usb controller.
+    #
+    def initialize(filename=nil)
+      @dev = File.open(filename || DEFAULT_FILE_NAME)
+      @block_size = 24
     rescue Errno::ENOENT => er
       puts "Could not find device: are your controllers plugged in?"
       raise er
     end
 
     #
-    # The format string which RubyHid uses to decode raw data.
+    # The format for each 24 bit data chunk taken from the event stream.
     #
     def format
-      @format ||= case @block_size
-                    when 16
-                      'llSSl'
-                    when 24
-                      'qqSSl'
-                  end
+      'qqSSl'
     end
 
     #
-    # Read a single block.
+    # Read a single 24-bit block.
     #
     def read
       bin = @dev.read @block_size
@@ -98,10 +76,9 @@ module RubyHid
       begin
         loop do
           event = read
-          if event
-            next unless ALLOWED_EVENT_TYPES.include?(event.type)
-            yield event
-          end
+          next unless event.type == 1
+          next unless event.value == 1
+          yield event
         end
       rescue Errno::ENODEV
       end
@@ -116,8 +93,9 @@ module RubyHid
       @worker = Thread.new do
         loop do
           event = read
-          next unless ALLOWED_EVENT_TYPES.include?(event.type)
-          RubyHid::Button.trigger_key(event.code)
+          next unless event.type == 1
+          next unless event.value == 1
+          RubyBuzz::Button.trigger_key(event.code)
         end
       end
     end

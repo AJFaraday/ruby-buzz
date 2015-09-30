@@ -1,4 +1,4 @@
-ruby-hid
+ruby-buzz
 ==========
 
 A Ruby library for controlling the LEDs on buzz controllers in Linux.
@@ -6,9 +6,9 @@ A Ruby library for controlling the LEDs on buzz controllers in Linux.
 * Linux only
 * Wired buzz controllers only
 
-*Warning:* ruby_hid has to change some rights down in the /sys and /dev
+*Warning:* ruby_buzz has to change some rights down in the /sys and /dev
 folders of Linux in order to access the kernel. You will be asked for
-your password in order to use ruby_hid.
+your password in order to use ruby_buzz.
 
 Example Scripts
 ===============
@@ -46,12 +46,69 @@ Pushing the buzzer lights that buzzer
 Using it in your code
 =====================
 
+Lights
+------
+
+Include the ruby_buzz library
+
+`require 'ruby_buzz'`
+
+The Buzz controller has 4 pads, each of which has four lights.
+They can be accessed like so:
+
+```ruby
+# Via the pads
+RubyBuzz::Pad[0]
+RubyBuzz::Pad[0].light
+RubyBuzz::Pad.all
+# A control for light 1, divorced from the pad.
+RubyBuzz::Light.new(0)
+```
+
+Control one light:
+
+```ruby
+pad = RubyBuzz::Pad[0]
+pad.light.on
+sleep 1
+pad.light.off
+```
+
+A quick light show
+
+```ruby
+RubyBuzz::Pad.all.each do |pad|
+  pad.light.on
+  sleep 0.1
+end 
+RubyBuzz::Pad.all.each do |pad|
+  pad.light.off
+  sleep 0.1
+end 
+```
+
+If you abandon your script before all the lights are turned off they
+will say on indefinitely. You may want to rescue SystemExit and Interrupt
+errors with `RubyBuzz::Light.all_off` E.g.
+
+```ruby
+begin
+  loop do
+    RubyBuzz::Pad[rand(4)].light.on
+    RubyBuzz::Pad[rand(4)].light.off
+    sleep 0.1
+  end 
+rescue SystemExit, Interrupt
+  RubyBuzz::Light.all_off
+end
+```
+
 Button events
 -------------
 
-Include the ruby_hid library
+Include the ruby_buzz library
 
-`require 'ruby_hid'`
+`require 'ruby_buzz'`
 
 The Buzz controller has 4 pads, each of which has four buttons named:
  
@@ -64,16 +121,16 @@ The Buzz controller has 4 pads, each of which has four buttons named:
 They can be found like this:
 
 ```ruby
-RubyHid::Pad[0]
-RubyHid::Pad[0].buttons
-RubyHid::Pad[0].buttons[:buzz]
-RubyHid::Pad.all
+RubyBuzz::Pad[0]
+RubyBuzz::Pad[0].buttons
+RubyBuzz::Pad[0].buttons[:buzz]
+RubyBuzz::Pad.all
 ```
 
 You can define a block of code to be run by a given button like this:
 
 ```ruby
-RubyHid::Pad[0].add_event(
+RubyBuzz::Pad[0].add_event(
   :buzz,
   lambda {
     puts "Player 1 buzzed!"
@@ -84,12 +141,12 @@ RubyHid::Pad[0].add_event(
 You can debug the actions you've added to a button with trigger_events
 
 ```ruby
-RubyHid::Pad[0].trigger_events
+RubyBuzz::Pad[0].trigger_events
 ```
 
 How about getting it to run when you press the button?
 
-The RubyHid::Device class is responsible for reading the raw input
+The RubyBuzz::Device class is responsible for reading the raw input
 from the Buzz controllers via the linux terminal. Because it's reading
 a data stream, it needs to start a background process to allow it to 
 work while other ruby code is operating.
@@ -98,8 +155,8 @@ You can start background process, which executes the events you added
 to the buttons, with start_watching.
 
 ```ruby
-device = RubyHid::Device.new
-RubyHid::Pad.all.each do |pad|
+device = RubyBuzz::Device.new
+RubyBuzz::Pad.all.each do |pad|
   pad.add_event(:buzz, lambda { puts "Buzz!" }
 )
 device.start_watching
@@ -112,8 +169,8 @@ If you want to do nothing other than watch the buttons, you may want
 to follow start_watching with an empty loop.
 
 ```ruby
-device = RubyHid::Device.new
-RubyHid::Pad.all.each do |pad|
+device = RubyBuzz::Device.new
+RubyBuzz::Pad.all.each do |pad|
   pad.add_event(:buzz, lambda { puts "Buzz!" }
 )
 device.start_watching

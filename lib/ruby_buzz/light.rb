@@ -1,4 +1,4 @@
-module RubyHid
+module RubyBuzz
   #
   # Each Pad has one LED light under the buzzer button.
   #
@@ -6,17 +6,17 @@ module RubyHid
   #
   # Accessed via Pad:
   #
-  # `RubyHid::Pad[0].light`
+  # `RubyBuzz::Pad[0].light`
   #
   # Controlled individually:
   #
-  # * `RubyHid::Pad[0].light.on`
-  # * `RubyHid::Pad[0].light.off`
+  # * `RubyBuzz::Pad[0].light.on`
+  # * `RubyBuzz::Pad[0].light.off`
   #
   # Controlled together:
   #
-  # * RubyHid::Light.all_on
-  # * RubyHid::Light.all_off
+  # * RubyBuzz::Light.all_on
+  # * RubyBuzz::Light.all_off
   #
   class Light
 

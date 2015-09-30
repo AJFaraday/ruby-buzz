@@ -1,6 +1,6 @@
-require_relative '../lib/ruby_hid.rb'
+require_relative '../lib/ruby_buzz.rb'
 
-RubyHid::Pad.all.each_with_index do |pad, index|
+RubyBuzz::Pad.all.each_with_index do |pad, index|
   pad.add_event :buzz,
                 lambda {
                   puts "Pushed buzzer #{index}"
@@ -9,14 +9,14 @@ RubyHid::Pad.all.each_with_index do |pad, index|
                 }
 end
 
-dev = RubyHid::Device.new
+dev = RubyBuzz::Device.new
 dev.start_watching
 
 begin
   loop do
-    RubyHid::Light.all.each{|p|p.light.off}
+    RubyBuzz::Light.all.each{|p|p.light.off}
     sleep 10
   end 
 rescue SystemExit, Interrupt
-  RubyHid::Light.all_off
+  RubyBuzz::Light.all_off
 end
