@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name        = 'ruby_buzz'
+  s.name        = 'ruby_hid'
   s.version     = '0.0.3'
   s.date        = '2015-09-23'
   s.summary     = 'Buzz™ controller support for Ruby in Linux'
@@ -7,9 +7,9 @@ Gem::Specification.new do |s|
   s.authors     = ['Andrew Faraday']
   s.email       = 'andrewfaraday@hotmail.co.uk'
   s.files       = Dir.glob("lib/**/*") + 
-                  ['lib/ruby_buzz.rb'] + 
+                  ['lib/ruby_hid.rb'] +
                   %w{ LICENCE README.md }
-  s.homepage    = 'https://github.com/AJFaraday/ruby-buzz'
+  s.homepage    = 'https://github.com/AJFaraday/ruby-hid'
   s.license     = 'MIT'
   # It might work fine on 1.9
   s.required_ruby_version = '>= 2.0.0'
